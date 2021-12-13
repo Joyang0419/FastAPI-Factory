@@ -15,6 +15,9 @@ docker-compose up -d
 cd ..
 alembic upgrade head
 
+# feed default data to database
+run database/seeder.py
+
 ```
 ### Active DEV server, auto check changes and reload
 ```

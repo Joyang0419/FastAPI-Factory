@@ -1,33 +1,13 @@
-import abc
 import asyncio
 import contextlib
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-
-class DBManager(metaclass=abc.ABCMeta):
-    """DataBase Abstract
-    responsibility: interface, DB connection tools
-    """
-
-    @abc.abstractmethod
-    def _initialize(self):
-        """db init, connect db"""
-        return NotImplemented
-
-    @abc.abstractmethod
-    def clean_up(self):
-        """empty db's connection"""
-        return NotImplemented
-
-    @abc.abstractmethod
-    def get_db(self):
-        """get db connection for using."""
-        return NotImplemented
+from src.SharedLibrary.db_manager.abstract import DBManager
 
 
-class AsyncSqlalchemy(DBManager):
+class ToolAsyncSqlalchemy(DBManager):
 
     def __init__(self, db_dialect: str, db_driver,
                  db_user: str, db_password: str, db_host: str,
@@ -47,9 +27,6 @@ class AsyncSqlalchemy(DBManager):
         """
         self.db_url = f"{db_dialect}+{db_driver}://{db_user}:{db_password}" \
                       f"@{db_host}:{db_port}/{db_name}"
-
-        self.migrate_url = f"{db_dialect}://{db_user}:{db_password}" \
-                           f"@{db_host}:{db_port}/{db_name}"
 
         self._engine = create_async_engine(
             url=self.db_url,
