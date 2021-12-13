@@ -71,7 +71,7 @@ class ToolAsyncSqlalchemy(DBManager):
 
 if __name__ == "__main__":
     async def example():
-        db_service = AsyncSqlalchemy(
+        db_service = ToolAsyncSqlalchemy(
             db_dialect='mysql', db_driver='aiomysql', db_user='test_user',
             db_password='test-pws', db_host='0.0.0.0', db_port=3306,
             db_name='user_profile', echo=True
