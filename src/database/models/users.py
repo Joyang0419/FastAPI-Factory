@@ -12,4 +12,5 @@ class User(Base):
     hashed_password = Column(String(20))
     is_active = Column(Boolean, default=True)
 
-    items = relationship("Item", back_populates="user")
+    items = relationship("Item", back_populates="user",
+                         cascade="all, delete", passive_deletes=True)
