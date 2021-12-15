@@ -7,5 +7,7 @@ models = modules
 
 with tool_sqlalchemy.get_db() as session:
     seeder = ResolvingSeeder(session=session)
-    new_entities = seeder.load_entities_from_json_file("./data.json")
+    new_entities = seeder.load_entities_from_json_file(
+        "./src/database/data.json"
+    )
     session.commit()

@@ -22,7 +22,7 @@ alembic upgrade head
 
 
 # To add current dir to python path, 
-PYTHONPATH=`pwd`
+export PYTHONPATH=`pwd`
 
 # feed default data to database
 python ./src/database/seeder.py
