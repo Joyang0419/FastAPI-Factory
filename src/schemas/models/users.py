@@ -21,6 +21,15 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     id: int
+    hashed_password: str
+    is_active: bool
+
+    class Config:
+        orm_mode = True
+
+
+class UserItem(UserBase):
+    id: int
     is_active: bool
     items: List[Item] = []
 

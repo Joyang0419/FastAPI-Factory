@@ -21,30 +21,50 @@ class AbstractRepository(abc.ABC):
         self.db = db
 
     async def get_all(self):
+
         stmt = select(self.model)
         result = await self._db_execute_stmt(stmt)
-        return result.all()
+
+        return result.scalars().all()
 
     async def get_by_ids(self, primary_ids: list) -> list:
+
         stmt = select(self.model).where(
             self.model.id.in_(primary_ids)
         )
         result = await self._db_execute_stmt(stmt)
-        return result.all()
 
-    async def delete_by_ids(self, primary_ids: list) -> None:
+        return result.scalars().all()
+
+    async def delete_by_ids(self, primary_ids: list):
+
+        delete_rows = await self.get_by_ids(primary_ids)
+
+        if not delete_rows:
+            return []
+
         stmt = delete(self.model)\
             .where(self.model.id.in_(primary_ids))
 
         await self._db_execute_stmt(stmt)
 
+        return delete_rows
+
     async def update_by_ids(self, primary_ids: list, pydantic_model: BaseModel):
+
+        update_rows = await self.get_by_ids(primary_ids)
+
+        if not update_rows:
+            return []
+
         stmt = update(self.model)\
             .where(self.model.id.in_(primary_ids))\
             .values(**(pydantic_model.dict(exclude_defaults=True)))\
-            .execution_options(synchronize_session="fetch")\
+            .execution_options(synchronize_session="fetch")
+        await self._db_execute_stmt(stmt=stmt)
+        await self._db_expire_all()
 
-        return await self._db_execute_stmt(stmt=stmt)
+        return update_rows
 
     async def insert(self, pydantic_models: List[BaseModel]):
         """
@@ -53,6 +73,7 @@ class AbstractRepository(abc.ABC):
         Returns:
 
         """
+
         model_objects = [self.model(**each.dict()) for each in pydantic_models]
         result = await self._db_complete_commit(model_objects=model_objects)
 
@@ -66,8 +87,10 @@ class AbstractRepository(abc.ABC):
         Returns:
             execute_result
         """
+
         async with self.db() as db:
             result = await db.execute(statement=stmt)
+
         return result
 
     async def _db_complete_commit(self, model_objects):
@@ -83,3 +106,9 @@ class AbstractRepository(abc.ABC):
             await db.commit()
 
         return model_objects
+
+    async def _db_expire_all(self):
+        """update latest value from your database"""
+
+        async with self.db() as db:
+            db.expire_all()

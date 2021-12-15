@@ -16,22 +16,26 @@ class RepoUser(AbstractRepository):
 
 if __name__ == "__main__":
     async def example():
+
         repo_user = RepoUser(db=tool_async_sqlalchemy.get_db)
-
         # insert
-        user_1 = UserCreate(email='test_107@gmail.com', hashed_password='123')
-        user_2 = UserCreate(email='test_108@gmail.com', hashed_password='123')
-        result = await repo_user.insert(pydantic_models=[user_1, user_2])
-        print(result)
-        primary_ids = [each.id for each in result]
+        # user_1 = UserCreate(email='test_115@gmail.com', hashed_password='123')
+        # user_2 = UserCreate(email='test_110@gmail.com', hashed_password='123')
+        # result = await repo_user.insert(pydantic_models=[user_1])
+        # print(result)
 
-        # get_all
-        output = await repo_user.get_all()
-        print(output)
+        # primary_ids = [each.id for each in result]
 
-        # get_by_ids
-        output = await repo_user.get_by_ids(primary_ids=primary_ids)
-        print(output)
+        # update
+
+
+        # # get_all
+        # output = await repo_user.get_all()
+        # print(output)
+        #
+        # # get_by_ids
+        # output = await repo_user.get_by_ids(primary_ids=primary_ids)
+        # print(output)
 
         # delete
         # await repo_user.delete_by_ids(primary_ids=primary_ids)
