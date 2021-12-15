@@ -20,8 +20,12 @@ docker-compose up -d
 cd ..
 alembic upgrade head
 
+
+# To add current dir to python path, 
+PYTHONPATH=`pwd`
+
 # feed default data to database
-run database/seeder.py
+python ./src/database/seeder.py
 
 ```
 ### Active DEV server, auto check changes and reload

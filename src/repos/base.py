@@ -1,4 +1,3 @@
-import abc
 from typing import Callable, List
 
 from pydantic import BaseModel
@@ -10,7 +9,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from src.database.models import *
 
 
-class AbstractRepository(abc.ABC):
+class BaseRepository:
 
     def __init__(self,
                  db: Callable[..., AsyncSession],

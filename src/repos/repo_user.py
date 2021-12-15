@@ -1,12 +1,12 @@
 from src.SharedLibrary.db_manager.tool_async_sqlalchemy import \
     ToolAsyncSqlalchemy
 from src.database.models.users import User
-from src.repos.abstract import AbstractRepository
+from src.repos.base import BaseRepository
 from src.schemas.models.items import ItemBase
 from src.database.models.items import Item
 
 
-class RepoUser(AbstractRepository):
+class RepoUser(BaseRepository):
 
     def __init__(self, db: ToolAsyncSqlalchemy.get_db, model: User = User):
         super().__init__(db=db, model=model)
