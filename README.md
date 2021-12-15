@@ -28,3 +28,6 @@ run database/seeder.py
 ```
 uvicorn src.application:app --reload
 ```
+
+# Future work
+- tests structure.
