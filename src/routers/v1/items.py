@@ -1,5 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List
 
+from fastapi import APIRouter, Query
+
+from src.schemas.models.items import ItemCreate, ItemUpdate
+from src.schemas.routers.items import ItemInfos
+from src.services.service_item import ServiceItem
 
 router = APIRouter(
     prefix="/v1/items",
@@ -8,28 +13,44 @@ router = APIRouter(
 )
 
 
-fake_items_db = {"plumbus": {"name": "Plumbus"}, "gun": {"name": "Portal Gun"}}
+@router.post("/create_item", response_model=ItemInfos)
+async def create_item(pydantic_models: List[ItemCreate]):
+    service = ServiceItem()
+
+    return await service.create_item(pydantic_models)
 
 
-@router.get("/")
-async def read_items():
-    return fake_items_db
+@router.get("/get_all_items", response_model=ItemInfos)
+async def get_all_items():
+    service = ServiceItem()
+
+    return await service.get_all_items()
 
 
-@router.get("/{item_id}")
-async def read_item(item_id: str):
-    if item_id not in fake_items_db:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return {"name": fake_items_db[item_id]["name"], "item_id": item_id}
-
-
-@router.put(
-    "/{item_id}",
-    responses={403: {"description": "Operation forbidden"}},
-)
-async def update_item(item_id: str):
-    if item_id != "plumbus":
-        raise HTTPException(
-            status_code=403, detail="You can only update the item: plumbus"
+@router.get("/get_item_by_ids", response_model=ItemInfos)
+async def get_user_by_ids(
+        item_ids: List[int] = Query(
+            default=None,
+            example=[1, 2]
         )
-    return {"item_id": item_id, "name": "The great Plumbus"}
+):
+    service = ServiceItem()
+
+    return await service.get_item_by_ids(item_ids=item_ids)
+
+
+@router.put("/update_item", response_model=ItemInfos)
+async def update_item_by_ids(item_ids: List[int], pydantic_model: ItemUpdate):
+    service = ServiceItem()
+
+    return await service.update_item_by_ids(
+        item_ids=item_ids,
+        pydantic_model=pydantic_model
+    )
+
+
+@router.delete("delete_items", response_model=ItemInfos)
+async def delete_user_by_ids(item_ids: List[int]):
+    service = ServiceItem()
+
+    return await service.delete_item_by_ids(item_ids)

@@ -24,7 +24,7 @@ class ServiceUser:
 
         return UserItemInfos(data=users_dict)
 
-    async def get_all_user(self):
+    async def get_all_users(self):
 
         result = await self.repo.get_all()
 

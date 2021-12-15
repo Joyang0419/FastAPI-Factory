@@ -2,6 +2,11 @@
 Provide every project init FastAPI
 
 ## Active server
+
+### create venv
+```
+pip install -r requirements.txt
+```
 ### Active Database
 ```
 cd docker

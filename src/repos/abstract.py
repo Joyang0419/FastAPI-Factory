@@ -62,7 +62,8 @@ class AbstractRepository(abc.ABC):
             .values(**(pydantic_model.dict(exclude_defaults=True)))\
             .execution_options(synchronize_session="fetch")
         await self._db_execute_stmt(stmt=stmt)
-        await self._db_expire_all()
+
+        update_rows = await self.get_by_ids(primary_ids)
 
         return update_rows
 
@@ -106,9 +107,3 @@ class AbstractRepository(abc.ABC):
             await db.commit()
 
         return model_objects
-
-    async def _db_expire_all(self):
-        """update latest value from your database"""
-
-        async with self.db() as db:
-            db.expire_all()

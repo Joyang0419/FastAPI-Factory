@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, Query
-from src.services.service_user import ServiceUser
-from typing import List, Union
-from src.schemas.routers.users import UserItemInfos, UserInfos
+from typing import List
+
+from fastapi import APIRouter, Query
+
 from src.schemas.models.users import UserCreate, UserUpdate
+from src.schemas.routers.users import UserItemInfos, UserInfos
+from src.services.service_user import ServiceUser
 
 router = APIRouter(
     prefix="/v1/users",
@@ -23,11 +25,11 @@ async def get_user_by_ids(
     return await service.get_user_by_ids(user_ids=user_ids)
 
 
-@router.get("/get_all", response_model=UserItemInfos)
+@router.get("/get_all_users", response_model=UserItemInfos)
 async def get_all_users():
     service = ServiceUser()
 
-    return await service.get_all_user()
+    return await service.get_all_users()
 
 
 @router.post("/create_user", response_model=UserInfos)

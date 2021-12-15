@@ -12,6 +12,10 @@ class ItemCreate(ItemBase):
     user_id: int
 
 
+class ItemUpdate(ItemBase):
+    pass
+
+
 class Item(ItemBase):
     id: int
     user_id: int
