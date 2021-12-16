@@ -1,11 +1,11 @@
-import asyncio
 import contextlib
+from typing import Callable
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.SharedLibrary.db_manager.abstract import DBManager
-from typing import Callable
+import asyncio
 
 
 class ToolAsyncSqlalchemy(DBManager):
@@ -87,3 +87,4 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(example())
+
