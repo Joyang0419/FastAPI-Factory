@@ -33,5 +33,8 @@ python ./src/database/seeder.py
 uvicorn src.application:app --reload
 ```
 
+# Explanation
+[Notion-note](https://nonchalant-mozzarella-71d.notion.site/FastAPI-SQLalchemy-alembic-Async-Await-e5626665abcd4940b2537f1fe0edd2bb)
+
 # Future work
 - tests structure.
