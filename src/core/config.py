@@ -1,9 +1,9 @@
-from pydantic import BaseSettings
 from pathlib import Path
 
+from pydantic import BaseSettings
 
-class Settings(BaseSettings):
-    """Pydantic Base Settings"""
+
+class ReadEnv(BaseSettings):
 
     class Config:
         env_file = Path(__file__)\
@@ -11,14 +11,28 @@ class Settings(BaseSettings):
         env_file_encoding = 'utf-8'
 
 
-class DatabaseConfig(Settings):
+class DatabaseConfig(ReadEnv):
     """Database Config"""
-    DB_DIALECT: str
-    DB_DRIVER: str
-    ASYNC_DB_DRIVER: str
-    DB_HOST: str
-    DB_PORT: int
-    DB_USER: str
-    DB_PWD: str
-    DB_NAME: str
-    DB_ECHO_LOG: bool
+    db_dialect: str
+    async_db_driver: str
+    db_driver: str
+    db_host: str
+    db_port: int
+    db_user: str
+    db_pwd: str
+    db_name: str
+    echo: bool
+
+
+class ApplicationConfig(ReadEnv):
+    """Application Config"""
+    title: str
+    version: str
+    debug: bool
+
+
+class Settings(BaseSettings):
+    """Pydantic Base Settings"""
+    app_config: ApplicationConfig = ApplicationConfig()
+    db_config: DatabaseConfig = DatabaseConfig()
+

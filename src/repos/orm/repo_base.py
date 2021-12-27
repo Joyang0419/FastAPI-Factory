@@ -1,25 +1,29 @@
 from typing import Callable, List
 
-from pydantic import BaseModel
 from sqlalchemy import select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 
+from src.repos.interface.repo_base import IFRepoBase
+
+
 # import all models for sqlalchemy mapping class(required)
-from src.database.models import *
+from src.models import items, users
+
+models = [users.User, items.Item]
 
 
-class BaseRepository:
+class RepoBase(IFRepoBase):
 
     def __init__(self,
                  db: Callable[..., AsyncSession],
-                 model: declarative_base()
+                 model: declarative_base
                  ):
 
         self.model = model
         self.db = db
 
-    async def get_all(self):
+    async def get_all(self) -> list:
 
         stmt = select(self.model)
         result = await self._db_execute_stmt(stmt)
@@ -49,16 +53,20 @@ class BaseRepository:
 
         return delete_rows
 
-    async def update_by_ids(self, primary_ids: list, pydantic_model: BaseModel):
+    async def update_by_ids(
+            self,
+            primary_ids: list,
+            data: dict
+    ):
 
         update_rows = await self.get_by_ids(primary_ids)
 
         if not update_rows:
             return []
 
-        stmt = update(self.model)\
-            .where(self.model.id.in_(primary_ids))\
-            .values(**(pydantic_model.dict(exclude_defaults=True)))\
+        stmt = update(self.model) \
+            .where(self.model.id.in_(primary_ids)) \
+            .values(**data) \
             .execution_options(synchronize_session="fetch")
         await self._db_execute_stmt(stmt=stmt)
 
@@ -66,7 +74,7 @@ class BaseRepository:
 
         return update_rows
 
-    async def insert(self, pydantic_models: List[BaseModel]):
+    async def insert(self, data: List[dict]):
         """
         Args:
             pydantic model: UserCreate, ItemCreate etc.
@@ -74,7 +82,7 @@ class BaseRepository:
 
         """
 
-        model_objects = [self.model(**each.dict()) for each in pydantic_models]
+        model_objects = [self.model(**each.__dict__) for each in data]
         result = await self._db_complete_commit(model_objects=model_objects)
 
         return result
