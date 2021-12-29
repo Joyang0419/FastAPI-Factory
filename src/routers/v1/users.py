@@ -1,7 +1,7 @@
 from typing import List
 
 from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Query, Depends
+from fastapi import APIRouter, Query, Depends, status, Response
 
 from src.container import Container
 from src.schemas.models.users import UserCreate, UserUpdate
@@ -37,7 +37,11 @@ async def get_user_by_ids(
     return await svc_user.get_user_by_ids(user_ids=user_ids)
 
 
-@router.post("/create_user", response_model=UserInfos)
+@router.post(
+    "/create_user",
+    response_model=UserInfos,
+    status_code=status.HTTP_201_CREATED
+)
 @inject
 async def create_user(
         data: List[UserCreate],
@@ -47,14 +51,19 @@ async def create_user(
     return await svc_user.create_user(data=data)
 
 
-@router.delete("delete_users", response_model=UserInfos)
+@router.delete(
+    "delete_users",
+    status_code=status.HTTP_204_NO_CONTENT
+)
 @inject
 async def delete_user_by_ids(
         user_ids: List[int],
         svc_user: SVCUser = Depends(Provide[Container.svc_user])
 ):
+    delete_users = await svc_user.delete_user_by_ids(user_ids)
 
-    return await svc_user.delete_user_by_ids(user_ids)
+    if not delete_users:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @router.put("/update_user", response_model=UserInfos)

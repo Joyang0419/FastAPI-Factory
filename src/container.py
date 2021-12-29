@@ -52,6 +52,8 @@ if __name__ == '__main__':
     container = Container()
     # container.config.from_pydantic(Settings())
 
+    print(container.imp_sqlalchemy().db_url)
+
     import asyncio
     async def example():
         a = await container.svc_user().get_all_users()

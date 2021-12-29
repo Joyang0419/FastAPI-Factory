@@ -1,6 +1,6 @@
 [
     {
-        "target_class": "src.database.models.users:User",
+        "target_class": "src.models.users:User",
         "data": [
             {
                 "id": "1",
@@ -17,7 +17,7 @@
         ]
     },
     {
-        "target_class": "src.database.models.items:Item",
+        "target_class": "src.models.items:Item",
         "data": [
             {
                 "id": "1",
@@ -25,7 +25,7 @@
                 "description": "test_desc",
                 "!refs": {
                     "user_id": {
-                        "target_class": "src.database.models.users:User",
+                        "target_class": "src.models.users:User",
                         "criteria": {
                             "id": "1"
                         },

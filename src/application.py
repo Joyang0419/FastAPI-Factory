@@ -21,6 +21,8 @@ def create_app() -> FastAPI:
         debug=container.config.app_config.debug()
     )
 
+    application.container = container
+
     # add router to application
     application.include_router(users.router)
 
