@@ -3,16 +3,9 @@ from fastapi import FastAPI
 from src.container import Container
 from src.routers.v1 import users
 
-from src.core.config import Settings
-
 
 def create_app() -> FastAPI:
     container = Container()
-    # config setting
-    container.config.from_pydantic(Settings())
-
-    # wire configuration
-    container.wire(packages=['src.routers'])
 
     # create FastAPI
     application = FastAPI(

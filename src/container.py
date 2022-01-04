@@ -16,6 +16,10 @@ class Container(containers.DeclarativeContainer):
 
     config = providers.Configuration(pydantic_settings=[Settings()])
 
+    wiring_config = containers.WiringConfiguration(
+        packages=['src.routers']
+    )
+
     imp_sqlalchemy = providers.Singleton(
         IMPSqlalchemy,
         db_dialect=config.db_config.db_dialect,
@@ -47,20 +51,4 @@ class Container(containers.DeclarativeContainer):
         resolver=resolver_repo_user
     )
 
-
-
-if __name__ == '__main__':
-    container = Container()
-
-    print(container.imp_sqlalchemy().db_url)
-
-    # import asyncio
-    # async def example():
-    #     a = await container.svc_user().get_all_users()
-    #     print(a)
-    #
-    #
-    #
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(example())
 
