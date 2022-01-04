@@ -4,7 +4,9 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-from src.database.settings import SQLALCHEMY_DATABASE_URL
+from src.container import Container
+container = Container()
+SQLALCHEMY_DATABASE_URL = container.imp_sqlalchemy().db_url
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -19,7 +21,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from src.database.settings import Base
+from src.models.base import Base
 target_metadata = [Base.metadata]
 
 # other values from the config, defined by the needs of env.py,
@@ -67,7 +69,8 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata
         )
 
         with context.begin_transaction():

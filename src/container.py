@@ -9,11 +9,12 @@ from src.resolvers.orm.resolver_user import IMPResolverRepoUser
 from src.schemas.models.users import User as UserSchema
 from src.schemas.routers.users import UserInfos
 from src.services.svc_user import SVCUser
+from src.core.config import Settings
 
 
 class Container(containers.DeclarativeContainer):
 
-    config = providers.Configuration()
+    config = providers.Configuration(pydantic_settings=[Settings()])
 
     imp_sqlalchemy = providers.Singleton(
         IMPSqlalchemy,
@@ -50,17 +51,16 @@ class Container(containers.DeclarativeContainer):
 
 if __name__ == '__main__':
     container = Container()
-    # container.config.from_pydantic(Settings())
 
     print(container.imp_sqlalchemy().db_url)
 
-    import asyncio
-    async def example():
-        a = await container.svc_user().get_all_users()
-        print(a)
-
-
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(example())
+    # import asyncio
+    # async def example():
+    #     a = await container.svc_user().get_all_users()
+    #     print(a)
+    #
+    #
+    #
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(example())
 

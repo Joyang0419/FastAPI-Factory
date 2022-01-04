@@ -8,8 +8,6 @@ models = modules
 
 container = Container()
 
-container.config.from_pydantic(Settings())
-
 with container.imp_sqlalchemy().get_db() as session:
     seeder = ResolvingSeeder(session=session)
     new_entities = seeder.load_entities_from_json_file(
