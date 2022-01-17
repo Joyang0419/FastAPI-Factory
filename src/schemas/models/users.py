@@ -1,8 +1,6 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
-
-from src.schemas.models.items import Item
 
 
 class UserBase(BaseModel):
@@ -23,7 +21,6 @@ class User(UserBase):
     id: int
     hashed_password: str
     is_active: bool
-    items: List[Item] = []
 
     class Config:
         orm_mode = True

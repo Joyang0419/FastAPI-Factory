@@ -6,6 +6,9 @@ from sqlalchemy import Column, Integer
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.declarative import declarative_base
+from src import models
+
+models = models
 
 
 class Base(object):

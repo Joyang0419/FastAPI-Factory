@@ -1,5 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Column, String
 
 from src.models.base import Base
 
@@ -10,6 +9,3 @@ class User(Base):
     email = Column(String(20), unique=True, index=True)
     hashed_password = Column(String(20))
     is_active = Column(Boolean, default=True)
-
-    items = relationship("Item", back_populates="user", cascade="all, delete",
-                         passive_deletes=True, lazy='immediate')
