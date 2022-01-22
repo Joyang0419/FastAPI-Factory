@@ -1,32 +1,15 @@
 import pytest
 
-from src.containers.container_repos import ContainerRepos
 from src.containers.container_services import ContainerServices
-from src.schemas.routers.users import UserInfos
+from src.message_bus.users import events
 from src.schemas.models.users import UserCreate, UserUpdate
 from src.schemas.routers.users import UserInfosOutputKey
 
 
 class TestServiceUsers:
 
-    @pytest.fixture(autouse=True)
-    def setup(self, fake_db_session):
-        """
-        repo_user(); change repo user use fake_db,
-        change service_user's repo_user, use fake user_repo.
-
-
-        Args:
-            fake_db_session: fake_session, never commit, therefore no influence
-            real database.
-
-        Returns:
-
-        """
-        repo_users = ContainerRepos().repo_users()
-        repo_users.db = fake_db_session
+    def setup(self):
         self.service_users = ContainerServices().service_users()
-        self.service_users.repo_users = repo_users
 
     @pytest.mark.asyncio
     async def test_get_all_users(self):
@@ -38,8 +21,9 @@ class TestServiceUsers:
         Returns:
 
         """
+        event = events.GetAllUsers(output_key=UserInfosOutputKey.id)
         output = await self.service_users.get_all_users(
-            output_key=UserInfosOutputKey.email
+            event=event
         )
 
         assert isinstance(output, dict)
@@ -68,9 +52,14 @@ class TestServiceUsers:
 
         """
 
+        event = events.GetUsersByIDs(
+            output_key=UserInfosOutputKey.id,
+            user_ids=test_case['user_ids']
+
+        )
+
         output = await self.service_users.get_users_by_ids(
-            user_ids=test_case['user_ids'],
-            output_key=UserInfosOutputKey.id
+            event=event
         )
 
         assert isinstance(output, dict)
@@ -104,9 +93,13 @@ class TestServiceUsers:
 
         """
 
-        output = await self.service_users.create_users(
+        event = events.CreateUsers(
             create_data=test_case['insert_data'],
             output_key=UserInfosOutputKey.email
+        )
+
+        output = await self.service_users.create_users(
+            event=event
         )
 
         assert isinstance(output, dict)
@@ -136,11 +129,13 @@ class TestServiceUsers:
 
         """
 
-        output = await self.service_users.update_users_by_ids(
+        event = events.UpdateUsersByIDS(
             user_ids=test_case['user_ids'],
-            update_data=test_case['update_data'].dict(),
+            update_data=test_case['update_data'],
             output_key=UserInfosOutputKey.id
         )
+
+        output = await self.service_users.update_users_by_ids(event)
 
         assert isinstance(output, dict)
 
@@ -167,9 +162,12 @@ class TestServiceUsers:
         Returns:
 
         """
+        event = events.DeleteUsersByIDs(
+            output_key=UserInfosOutputKey.id,
+            user_ids=test_case['user_ids']
+        )
         output = await self.service_users.delete_users_by_ids(
-            user_ids=test_case['user_ids'],
-            output_key=UserInfosOutputKey.id
+            event=event
         )
 
         assert isinstance(output, dict)

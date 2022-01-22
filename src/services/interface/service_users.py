@@ -1,4 +1,5 @@
 import abc
+from src.message_bus.users import events
 
 
 class IFServiceUsers(abc.ABC):
@@ -6,7 +7,7 @@ class IFServiceUsers(abc.ABC):
     @abc.abstractmethod
     def get_all_users(
             self,
-            output_key: str
+            event: events.GetAllUsers
     ) -> dict:
 
         return NotImplemented
@@ -14,8 +15,7 @@ class IFServiceUsers(abc.ABC):
     @abc.abstractmethod
     def get_users_by_ids(
             self,
-            user_ids: [int],
-            output_key: str
+            event: events.GetUsersByIDs
     ) -> dict:
 
         return NotImplemented
@@ -23,9 +23,7 @@ class IFServiceUsers(abc.ABC):
     @abc.abstractmethod
     def update_users_by_ids(
             self,
-            user_ids: [int],
-            update_data: dict,
-            output_key: str
+            event: events.UpdateUsersByIDS
     ) -> dict:
 
         return NotImplemented
@@ -33,8 +31,7 @@ class IFServiceUsers(abc.ABC):
     @abc.abstractmethod
     def create_users(
             self,
-            create_data: dict,
-            output_key: str
+            event: events.CreateUsers
     ) -> dict:
 
         return NotImplemented
@@ -42,9 +39,12 @@ class IFServiceUsers(abc.ABC):
     @abc.abstractmethod
     def delete_users_by_ids(
             self,
-            user_ids: [int],
-            output_key: str
+            event: events.DeleteUsersByIDs
     ) -> dict:
 
+        return NotImplemented
+
+    @abc.abstractmethod
+    def send_notification(self, event: events.Event):
         return NotImplemented
 

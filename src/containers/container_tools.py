@@ -1,7 +1,8 @@
 from dependency_injector import providers, containers
 
 from src.containers.container_configs import ContainerConfigs
-from src.tools.tool_db_manager.imp_sqlalchemy import IMPSqlalchemy
+from src.tools.db_manager.imp_sqlalchemy import IMPSqlalchemy
+from src.tools.notification.imp_gmail import IMPGmail
 
 
 container_configs = ContainerConfigs()
@@ -21,4 +22,6 @@ class ContainerTools(containers.DeclarativeContainer):
         db_name=container_configs.config.db_config.db_name,
         echo=container_configs.config.db_config.echo
     )
-
+    notification_manager = providers.Factory(
+        IMPGmail
+    )

@@ -1,16 +1,15 @@
 import typing
 
+from src.containers.container_tools import ContainerTools
+from src.message_bus.users import events
 from src.models.users import User as ModelUser
 from src.repos.orm.repo_users import IMPRepoUsers
 from src.schemas.models.users import (
-    User as SchemaUser,
-    UserUpdate as SchemaUserUpdate,
-    UserCreate as SchemaUserCreate
-)
-from src.schemas.routers.users import (
-    UserInfosOutputKey
+    User as SchemaUser
 )
 from src.services.interface.service_users import IFServiceUsers
+
+container_tools = ContainerTools()
 
 
 class IMPServiceUsers(IFServiceUsers):
@@ -23,85 +22,107 @@ class IMPServiceUsers(IFServiceUsers):
             repo_users: IMPRepoUsers,
     ):
         self.repo_users = repo_users
+        self.events = []
 
     async def get_all_users(
             self,
-            output_key: UserInfosOutputKey
+            event: events.GetAllUsers
     ) -> dict:
 
         repo_result = await self.repo_users.get_all_users()
-        output = self._packing_be_output_dict(
-            input_data=repo_result,
-            output_key=output_key
-        )
-
-        return output
+        if repo_result:
+            handled_data = self._packing_be_output_dict(
+                input_data=repo_result,
+                output_key=event.output_key
+            )
+            return handled_data
+        else:
+            return {}
 
     async def get_users_by_ids(
             self,
-            user_ids: [int],
-            output_key: UserInfosOutputKey
+            event: events.GetUsersByIDs
     ) -> dict:
 
         repo_result = await self.repo_users.get_users_by_ids(
-            user_ids=user_ids
+            user_ids=event.user_ids
         )
-        output = self._packing_be_output_dict(
-            output_key=output_key,
+        handled_data = self._packing_be_output_dict(
+            output_key=event.output_key,
             input_data=repo_result
         )
 
-        return output
+        return handled_data
 
     async def update_users_by_ids(
             self,
-            user_ids: [int],
-            update_data: SchemaUserUpdate,
-            output_key: UserInfosOutputKey
+            event: events.UpdateUsersByIDS
     ) -> dict:
+        output = {}
 
         repo_result = await self.repo_users.update_users_by_ids(
-            user_ids=user_ids,
-            data=update_data
+            user_ids=event.user_ids,
+            data=event.update_data
         )
 
-        output = self._packing_be_output_dict(
-            output_key=output_key,
-            input_data=repo_result
-        )
+        if repo_result:
+
+            output = self._packing_be_output_dict(
+                output_key=event.output_key,
+                input_data=repo_result
+            )
+
+            for each_user in output.values():
+                event = events.Notification(
+                    message=f"User id: {each_user.id}, data updated."
+                )
+                self.events.append(event)
 
         return output
 
     async def create_users(
             self,
-            create_data: typing.List[SchemaUserCreate.dict],
-            output_key: UserInfosOutputKey.id
+            event: events.CreateUsers
     ) -> dict:
 
         repo_result = await self.repo_users.create_users(
-            data=create_data
+            data=event.create_data
         )
 
         output = self._packing_be_output_dict(
-            output_key=output_key,
+            output_key=event.output_key,
             input_data=repo_result
         )
+
+        for each_user in output.values():
+            event = events.Notification(
+                message=f"User id: {each_user.id}, created."
+            )
+            self.events.append(event)
 
         return output
 
     async def delete_users_by_ids(
             self,
-            user_ids: [int],
-            output_key: UserInfosOutputKey) -> dict:
+            event: events.DeleteUsersByIDs
+    ) -> dict:
+        output = {}
 
         repo_result = await self.repo_users.delete_users_by_ids(
-            user_ids=user_ids,
+            user_ids=event.user_ids,
         )
 
-        output = self._packing_be_output_dict(
-            output_key=output_key,
-            input_data=repo_result
-        )
+        if repo_result:
+            output = self._packing_be_output_dict(
+                output_key=event.output_key,
+                input_data=repo_result
+            )
+
+            for each_user in output.values():
+                event = events.Notification(
+                    message=f"User id: {each_user.id}, deleted."
+                )
+                self.events.append(event)
 
         return output
 
@@ -133,4 +154,11 @@ class IMPServiceUsers(IFServiceUsers):
 
         return output_data_dict
 
+    def collect_new_events(self):
+        while self.events:
+            yield self.events.pop(0)
 
+    def send_notification(self, event: events.Notification) -> bool:
+        return container_tools.notification_manager().send_notification(
+            message=event.message
+        )

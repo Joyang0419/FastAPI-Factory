@@ -1,10 +1,10 @@
 from typing import List
 
-from dependency_injector.wiring import inject, Provide
+from dependency_injector.wiring import inject
 from fastapi import APIRouter, Query, Depends, status, Response
 
-from src.containers.container_controllers import ContainerControllers
-from src.controllers.orm.controller_users import IMPControllerUsers
+from src.message_bus.users import events
+from src.message_bus.users.handler import UsersHandler
 from src.schemas.models.users import UserCreate, UserUpdate
 from src.schemas.routers.users import UserInfos
 from src.schemas.routers.users import UserInfosOutputKey
@@ -20,12 +20,12 @@ router = APIRouter(
 @inject
 async def get_all_users(
         output_key: UserInfosOutputKey,
-        controller_users: IMPControllerUsers = Depends(
-            Provide[ContainerControllers.controller_users]
-        )
+        handler=Depends(UsersHandler)
 ):
-
-    return await controller_users.get_all_users(output_key=output_key)
+    event = events.GetAllUsers(output_key=output_key)
+    results = await handler.handle(event)
+    data = results.pop(0)
+    return UserInfos(data=data)
 
 
 @router.get("/get_user_by_ids", response_model=UserInfos)
@@ -36,15 +36,15 @@ async def get_users_by_ids(
             default=None,
             example=[19]
         ),
-        controller_users: IMPControllerUsers = Depends(
-            Provide[ContainerControllers.controller_users]
-        )
+        handler=Depends(UsersHandler)
 ):
-
-    return await controller_users.get_users_by_ids(
-        user_ids=user_ids,
-        output_key=output_key
+    event = events.GetUsersByIDs(
+        output_key=output_key,
+        user_ids=user_ids
     )
+    results = await handler.handle(event)
+    data = results.pop(0)
+    return UserInfos(data=data)
 
 
 @router.post(
@@ -56,15 +56,16 @@ async def get_users_by_ids(
 async def create_users(
         output_key: UserInfosOutputKey,
         data: List[UserCreate],
-        controller_users: IMPControllerUsers = Depends(
-            Provide[ContainerControllers.controller_users]
-        )
+        handler=Depends(UsersHandler)
 ):
 
-    return await controller_users.create_users(
-        create_data=data,
-        output_key=output_key
+    event = events.CreateUsers(
+        output_key=output_key,
+        create_data=data
     )
+    results = await handler.handle(event)
+    data = results.pop(0)
+    return UserInfos(data=data)
 
 
 @router.delete(
@@ -75,16 +76,16 @@ async def create_users(
 async def delete_users_by_ids(
         output_key: UserInfosOutputKey,
         user_ids: List[int],
-        controller_users: IMPControllerUsers = Depends(
-            Provide[ContainerControllers.controller_users]
-        )
+        handler=Depends(UsersHandler)
 ):
-    delete_users = await controller_users.delete_users_by_ids(
+    event = events.DeleteUsersByIDs(
+        output_key=output_key,
         user_ids=user_ids,
-        output_key=output_key
     )
+    results = await handler.handle(event)
+    data: list = results.pop(0)
 
-    if not delete_users:
+    if not data:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     else:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -96,12 +97,13 @@ async def update_users_by_ids(
         output_key: UserInfosOutputKey,
         user_ids: List[int],
         data: UserUpdate,
-        controller_users: IMPControllerUsers = Depends(
-            Provide[ContainerControllers.controller_users]
-        )
+        handler=Depends(UsersHandler)
 ):
-    return await controller_users.update_users_by_ids(
+    event = events.UpdateUsersByIDS(
         output_key=output_key,
         user_ids=user_ids,
         update_data=data
     )
+    results = await handler.handle(event)
+    data = results.pop(0)
+    return UserInfos(data=data)

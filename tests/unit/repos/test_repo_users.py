@@ -7,19 +7,8 @@ from src.schemas.models.users import UserCreate, UserUpdate
 
 class TestRepoUser:
 
-    @pytest.fixture(autouse=True)
-    def setup(self, fake_db_session):
-        """
-
-        Args:
-            fake_db_session: fake_session, never commit, therefore no influence real
-            database.
-
-        Returns:
-
-        """
+    def setup(self):
         self.repo_user = ContainerRepos().repo_users()
-        self.repo_user.db = fake_db_session
 
     @pytest.mark.asyncio
     async def test_get_all_users(self):

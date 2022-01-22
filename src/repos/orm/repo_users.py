@@ -2,6 +2,7 @@ from typing import Callable
 from typing import List, Union
 
 from sqlalchemy import select, delete, update
+from sqlalchemy.exc import ArgumentError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.users import User
@@ -19,6 +20,7 @@ class IMPRepoUsers(IFRepoUser):
             db: Callable[..., AsyncSession],
     ):
         self.db = db
+        self.events = []
 
     async def _db_execute_stmt(self, stmt: str):
         """
@@ -42,11 +44,12 @@ class IMPRepoUsers(IFRepoUser):
             [sqlalchemy object]
 
         """
-
-        stmt = select(User)
-        result = await self._db_execute_stmt(stmt)
-
-        return result.scalars().all()
+        try:
+            stmt = select(User)
+            result = await self._db_execute_stmt(stmt)
+            return result.scalars().all()
+        except ArgumentError:
+            print('SQL error.')
 
     async def get_users_by_ids(self, user_ids: list) -> list:
         """

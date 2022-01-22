@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application import app
 from src.containers.container_tools import ContainerTools
-from src.tools.tool_db_manager.imp_sqlalchemy import IMPSqlalchemy
+from src.tools.db_manager.imp_sqlalchemy import IMPSqlalchemy
 
 db_manager = ContainerTools().db_manager()
 
@@ -41,23 +41,6 @@ async def fake_db_session() -> AsyncSession:
 
     """
     yield db_manager.get_fake_async_db
-
-
-from asynctest import MagicMock
-
-
-class AsyncContextManagerMock(MagicMock):
-    """
-    References: https://stackoverflow.com/questions/48761985/
-    how-to-mock-aiohttp-client-clientsession-get-async-context-manager
-
-    https://github.com/Martiusweb/asynctest/issues/29
-    """
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, *args):
-        pass
 
 
 @pytest.fixture(scope='function', autouse=True)
