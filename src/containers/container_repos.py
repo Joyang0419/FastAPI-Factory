@@ -1,9 +1,9 @@
 from dependency_injector import providers, containers
 
-from src.containers.container_tools import ContainerTools
+from src.containers.container_utilities import ContainerUtilities
 from src.repos.orm.repo_users import IMPRepoUsers
 
-container_tools = ContainerTools()
+container_tools = ContainerUtilities()
 
 
 class ContainerRepos(containers.DeclarativeContainer):

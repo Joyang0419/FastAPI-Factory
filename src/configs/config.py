@@ -31,8 +31,14 @@ class ApplicationConfig(ReadEnv):
     debug: bool
 
 
+class PWDCryptConfig(ReadEnv):
+    """PWDCryptConfig Config"""
+    schemes: str
+    deprecated: str
+
+
 class Settings(BaseSettings):
     """Pydantic Base Settings"""
     app_config: ApplicationConfig = ApplicationConfig()
     db_config: DatabaseConfig = DatabaseConfig()
-
+    pwd_crypt_config: PWDCryptConfig = PWDCryptConfig()

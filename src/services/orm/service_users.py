@@ -1,6 +1,6 @@
 import typing
 
-from src.containers.container_tools import ContainerTools
+from src.containers.container_utilities import ContainerUtilities
 from src.message_bus.users import events
 from src.models.users import User as ModelUser
 from src.repos.orm.repo_users import IMPRepoUsers
@@ -9,7 +9,8 @@ from src.schemas.models.users import (
 )
 from src.services.interface.service_users import IFServiceUsers
 
-container_tools = ContainerTools()
+container_utilities = ContainerUtilities()
+crypt_manager = container_utilities.crypt_manager()
 
 
 class IMPServiceUsers(IFServiceUsers):
@@ -60,6 +61,11 @@ class IMPServiceUsers(IFServiceUsers):
     ) -> dict:
         output = {}
 
+        if event.update_data.password:
+            event.update_data.password = self._hash_pwd(
+                event.update_data.password
+            )
+
         repo_result = await self.repo_users.update_users_by_ids(
             user_ids=event.user_ids,
             data=event.update_data
@@ -85,6 +91,9 @@ class IMPServiceUsers(IFServiceUsers):
             event: events.CreateUsers
     ) -> dict:
 
+        for each in event.create_data:
+            each.password = self._hash_pwd(each.password)
+
         repo_result = await self.repo_users.create_users(
             data=event.create_data
         )
@@ -101,6 +110,10 @@ class IMPServiceUsers(IFServiceUsers):
             self.events.append(event)
 
         return output
+
+    @staticmethod
+    def _hash_pwd(pwd: str) -> str:
+        return crypt_manager.get_pwd_hash(pwd=pwd)
 
     async def delete_users_by_ids(
             self,
@@ -159,6 +172,6 @@ class IMPServiceUsers(IFServiceUsers):
             yield self.events.pop(0)
 
     def send_notification(self, event: events.Notification) -> bool:
-        return container_tools.notification_manager().send_notification(
+        return container_utilities.notification_manager().send_notification(
             message=event.message
         )

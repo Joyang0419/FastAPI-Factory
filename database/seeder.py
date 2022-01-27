@@ -2,12 +2,12 @@ import pathlib
 
 from sqlalchemyseeder import ResolvingSeeder
 
-from src.containers.container_tools import ContainerTools
+from src.containers.container_utilities import ContainerUtilities
 from src.models import modules
 
 models = modules
 
-container_tools = ContainerTools()
+container_tools = ContainerUtilities()
 
 orm_session = container_tools.db_manager().get_db
 

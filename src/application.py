@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from src.containers.container_configs import ContainerConfigs
 from src.containers.container_repos import ContainerRepos
 from src.containers.container_services import ContainerServices
-from src.containers.container_tools import ContainerTools
+from src.containers.container_utilities import ContainerUtilities
 from src.routers.v1 import users
 
 
@@ -11,7 +11,7 @@ def create_app() -> FastAPI:
 
     # containers
     container_services = ContainerServices()
-    container_tools = ContainerTools()
+    container_tools = ContainerUtilities()
     container_repos = ContainerRepos()
     container_configs = ContainerConfigs()
 

@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, Session
 
-from src.tools.db_manager.interface import IFDBManager
+from src.utilities.db_manager.interface import IFDBManager
 
 
 class IMPSqlalchemy(IFDBManager):

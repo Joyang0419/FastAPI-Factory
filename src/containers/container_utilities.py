@@ -1,14 +1,15 @@
 from dependency_injector import providers, containers
+from passlib.context import CryptContext
 
 from src.containers.container_configs import ContainerConfigs
-from src.tools.db_manager.imp_sqlalchemy import IMPSqlalchemy
-from src.tools.notification.imp_gmail import IMPGmail
-
+from src.utilities.db_manager.imp_sqlalchemy import IMPSqlalchemy
+from src.utilities.encrypt_pwd.imp_crypt_context import IMPCryptManager
+from src.utilities.notification.imp_gmail import IMPGmail
 
 container_configs = ContainerConfigs()
 
 
-class ContainerTools(containers.DeclarativeContainer):
+class ContainerUtilities(containers.DeclarativeContainer):
 
     db_manager = providers.Singleton(
         IMPSqlalchemy,
@@ -24,4 +25,15 @@ class ContainerTools(containers.DeclarativeContainer):
     )
     notification_manager = providers.Factory(
         IMPGmail
+    )
+
+    crypt_context = providers.Singleton(
+        CryptContext,
+        schemes=container_configs.config.pwd_crypt_config.schemes,
+        deprecated=container_configs.config.pwd_crypt_config.deprecated
+    )
+
+    crypt_manager = providers.Factory(
+        IMPCryptManager,
+        crypt_context=crypt_context
     )

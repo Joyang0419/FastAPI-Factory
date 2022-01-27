@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from src.containers.container_tools import ContainerTools
+from src.containers.container_utilities import ContainerUtilities
 
 
 class TestDBManager:
@@ -14,7 +14,7 @@ class TestDBManager:
         Returns:
 
         """
-        self.db_manager = ContainerTools().db_manager()
+        self.db_manager = ContainerUtilities().db_manager()
 
     def test_connection(self):
         """

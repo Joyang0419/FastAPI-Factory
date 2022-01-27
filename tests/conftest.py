@@ -6,10 +6,10 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application import app
-from src.containers.container_tools import ContainerTools
-from src.tools.db_manager.imp_sqlalchemy import IMPSqlalchemy
+from src.containers.container_utilities import ContainerUtilities
+from src.utilities.db_manager.imp_sqlalchemy import IMPSqlalchemy
 
-db_manager = ContainerTools().db_manager()
+db_manager = ContainerUtilities().db_manager()
 
 
 @pytest.fixture(scope="session")

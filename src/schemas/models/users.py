@@ -8,18 +8,18 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    hashed_password: str
+    password: str
 
 
 class UserUpdate(UserBase):
     email: Optional[str]
-    hashed_password: Optional[str]
+    password: Optional[str]
     is_active: Optional[bool]
 
 
 class User(UserBase):
     id: int
-    hashed_password: str
+    password: str
     is_active: bool
 
     class Config:

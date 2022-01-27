@@ -71,7 +71,7 @@ class TestServiceUsers:
                     'insert_data': [
                         UserCreate(
                             email='test_1_email',
-                            hashed_password='test_1_pwd'
+                            password='test_1_pwd'
                         )
                     ]
                 },

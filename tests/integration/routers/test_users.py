@@ -145,54 +145,6 @@ class TestUsers:
             pytest.param(
                 {
                     'output_key': UserInfosOutputKey.id.value,
-                    'data': [
-                        UserCreate(
-                            email='test_email1',
-                            hashed_password='test_pwd'
-                        ).dict()
-                    ]
-                },
-                id="Normal Case"
-            )
-        ]
-    )
-    @pytest.mark.asyncio
-    async def test_create_users(self, test_case):
-        """
-        GIVEN test_client.
-
-        WHEN test_client.get endpoint: v1/users/create_users.
-
-        THEN
-            - assert response status code.
-            - assert data in response_data.
-        Args:
-            test_case:
-
-        Returns:
-
-        """
-        async with self.client as ac:
-            response = await ac.request(
-                url='v1/users/create_users',
-                params={
-                    'output_key': test_case['output_key'],
-                },
-                method='POST',
-                json=test_case['data']
-            )
-
-        assert response.status_code is status.HTTP_201_CREATED
-
-        response_data = response.json()
-
-        assert 'data' in response_data
-
-    @pytest.mark.parametrize(
-        "test_case", [
-            pytest.param(
-                {
-                    'output_key': UserInfosOutputKey.id.value,
                     'user_ids': [96],
                     'data': UserUpdate(
                             hashed_password='test_pwd1'
@@ -379,7 +331,7 @@ class TestUsers:
                     'data': [
                         UserCreate(
                             email='test_email1',
-                            hashed_password='test_pwd'
+                            password='test_pwd'
                         ).dict()
                     ]
                 },
