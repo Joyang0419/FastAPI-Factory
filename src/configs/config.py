@@ -37,8 +37,16 @@ class PWDCryptConfig(ReadEnv):
     deprecated: str
 
 
+class TokenConfig(ReadEnv):
+    """Token Config"""
+    secret_key: str
+    algorithm: str
+    access_token_expire_minutes: int
+
+
 class Settings(BaseSettings):
     """Pydantic Base Settings"""
     app_config: ApplicationConfig = ApplicationConfig()
     db_config: DatabaseConfig = DatabaseConfig()
     pwd_crypt_config: PWDCryptConfig = PWDCryptConfig()
+    token_config: TokenConfig = TokenConfig()

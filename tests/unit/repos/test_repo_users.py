@@ -14,7 +14,9 @@ class TestRepoUser:
     async def test_get_all_users(self):
         """
         GIVEN an self.repo_user,
+
         WHEN repo_user.get_all_users(),
+
         THEN assert db_result instance is list
 
         Returns:
@@ -43,7 +45,9 @@ class TestRepoUser:
     async def test_delete_users_by_ids(self, test_case):
         """
         GIVEN an self.repo_user,
+
         WHEN repo_user.delete_users_by_ids(),
+
         THEN assert for each db_result is isinstance is User or db_result is []
 
         Args:
@@ -72,7 +76,9 @@ class TestRepoUser:
     async def test_get_users_by_ids(self, test_case):
         """
         GIVEN an self.repo_user,
+
         WHEN repo_user.get_users_by_ids(),
+
         THEN assert each_db_result's id in test_case['users_id']
 
         Args:
@@ -102,7 +108,9 @@ class TestRepoUser:
     async def test_update_users_by_ids(self, test_case):
         """
         GIVEN an self.repo_user,
+
         WHEN repo_user.update_users_by_ids(),
+
         THEN assert db_results's each data == test_case['updated_data']
 
         Args:
@@ -145,7 +153,9 @@ class TestRepoUser:
     async def test_create_users(self, test_case):
         """
         GIVEN an self.repo_user,
+
         WHEN repo_user.create_users(),
+
         THEN assert db_results's each data isinstance Model User.
 
         Args:
@@ -160,3 +170,18 @@ class TestRepoUser:
 
         for each in db_result:
             assert isinstance(each, User)
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('email', ['string', 'no_exist'])
+    async def test_get_user_by_email(self, email):
+        """
+        GIVEN an self.repo_user,
+
+        WHEN repo_user.get_user_by_email(),
+
+        THEN assert db_result instance is None or User obj
+        Returns:
+
+        """
+        db_result = await self.repo_user.get_user_by_email(email=email)
+        assert isinstance(db_result, (type(None), User))

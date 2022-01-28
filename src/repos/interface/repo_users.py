@@ -1,5 +1,7 @@
 import abc
 import typing
+from src.models.users import User
+
 
 
 class IFRepoUser(abc.ABC):
@@ -22,4 +24,8 @@ class IFRepoUser(abc.ABC):
 
     @abc.abstractmethod
     def create_users(self, data: typing.List[dict]):
+        return NotImplemented
+
+    @abc.abstractmethod
+    def get_user_by_email(self, email: str) -> typing.Optional[User]:
         return NotImplemented

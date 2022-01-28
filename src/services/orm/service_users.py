@@ -32,7 +32,7 @@ class IMPServiceUsers(IFServiceUsers):
 
         repo_result = await self.repo_users.get_all_users()
         if repo_result:
-            handled_data = self._packing_be_output_dict(
+            handled_data = self.packing_be_output_dict(
                 input_data=repo_result,
                 output_key=event.output_key
             )
@@ -48,7 +48,7 @@ class IMPServiceUsers(IFServiceUsers):
         repo_result = await self.repo_users.get_users_by_ids(
             user_ids=event.user_ids
         )
-        handled_data = self._packing_be_output_dict(
+        handled_data = self.packing_be_output_dict(
             output_key=event.output_key,
             input_data=repo_result
         )
@@ -73,7 +73,7 @@ class IMPServiceUsers(IFServiceUsers):
 
         if repo_result:
 
-            output = self._packing_be_output_dict(
+            output = self.packing_be_output_dict(
                 output_key=event.output_key,
                 input_data=repo_result
             )
@@ -98,7 +98,7 @@ class IMPServiceUsers(IFServiceUsers):
             data=event.create_data
         )
 
-        output = self._packing_be_output_dict(
+        output = self.packing_be_output_dict(
             output_key=event.output_key,
             input_data=repo_result
         )
@@ -126,7 +126,7 @@ class IMPServiceUsers(IFServiceUsers):
         )
 
         if repo_result:
-            output = self._packing_be_output_dict(
+            output = self.packing_be_output_dict(
                 output_key=event.output_key,
                 input_data=repo_result
             )
@@ -140,7 +140,7 @@ class IMPServiceUsers(IFServiceUsers):
         return output
 
     @staticmethod
-    def _packing_be_output_dict(
+    def packing_be_output_dict(
             input_data: typing.List[ModelUser],
             output_key: str
     ) -> dict:

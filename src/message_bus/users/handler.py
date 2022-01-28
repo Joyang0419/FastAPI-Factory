@@ -5,11 +5,14 @@ from src.message_bus.users import events
 
 container_service = ContainerServices()
 
+from src.message_bus.interface_handler import IFHandler
 
-class UsersHandler:
+
+class UsersHandler(IFHandler):
 
     def __init__(self):
         self.service_user = container_service.service_users()
+        IFHandler.__init__(self, service=self.service_user)
 
     @property
     def handlers(self) -> Dict[Type[events.Event], List[Callable]]:
@@ -21,14 +24,3 @@ class UsersHandler:
             events.DeleteUsersByIDs: [self.service_user.delete_users_by_ids],
             events.CreateUsers: [self.service_user.create_users]
         }
-
-    async def handle(self, event: events.Event):
-        results = []
-        queue = [event]
-        while queue:
-            event = queue.pop(0)
-            for handler in self.handlers[type(event)]:
-                result = await handler(event)
-                results.append(result)
-                queue.extend(self.service_user.collect_new_events())
-        return results

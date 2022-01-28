@@ -20,7 +20,7 @@ router = APIRouter(
 @inject
 async def get_all_users(
         output_key: UserInfosOutputKey,
-        handler=Depends(UsersHandler)
+        handler=Depends(UsersHandler),
 ):
     event = events.GetAllUsers(output_key=output_key)
     results = await handler.handle(event)

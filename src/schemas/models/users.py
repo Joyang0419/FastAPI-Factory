@@ -11,6 +11,10 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserAuthenticate(UserBase):
+    password: str
+
+
 class UserUpdate(UserBase):
     email: Optional[str]
     password: Optional[str]

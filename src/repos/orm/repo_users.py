@@ -1,9 +1,12 @@
 from typing import Callable
-from typing import List, Union
+from typing import List, Union, Optional
 
 from sqlalchemy import select, delete, update
 from sqlalchemy.exc import ArgumentError
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+)
+from sqlalchemy.ext.asyncio.result import AsyncResult
 
 from src.models.users import User
 from src.repos.interface.repo_users import IFRepoUser
@@ -22,7 +25,7 @@ class IMPRepoUsers(IFRepoUser):
         self.db = db
         self.events = []
 
-    async def _db_execute_stmt(self, stmt: str):
+    async def _db_execute_stmt(self, stmt: str) -> AsyncResult:
         """
         execute sql statement.
 
@@ -47,6 +50,7 @@ class IMPRepoUsers(IFRepoUser):
         try:
             stmt = select(User)
             result = await self._db_execute_stmt(stmt)
+
             return result.scalars().all()
         except ArgumentError:
             print('SQL error.')
@@ -69,6 +73,22 @@ class IMPRepoUsers(IFRepoUser):
         result = await self._db_execute_stmt(stmt)
 
         return result.scalars().all()
+
+    async def get_user_by_email(self, email: str) -> Optional[User]:
+        """
+
+        Args:
+            email:
+
+        Returns:
+
+        """
+        stmt = select(User).where(
+            User.email == email
+        )
+        result = await self._db_execute_stmt(stmt)
+
+        return result.scalars().one_or_none()
 
     async def create_users(self, data: List[UserCreate]):
         """
@@ -147,3 +167,25 @@ class IMPRepoUsers(IFRepoUser):
         update_rows = await self.get_users_by_ids(user_ids)
 
         return update_rows
+
+if __name__ == '__main__':
+    from src.containers.container_utilities import ContainerUtilities
+    import asyncio
+
+    import asyncio
+
+
+    async def qqq():
+        a = ContainerUtilities().db_manager()
+        b = IMPRepoUsers(
+            db=a.get_async_db
+        )
+        c = await b.get_user_by_email(email='string')
+        print(type(c))
+
+    # correct todo delete
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(qqq())
+
+
+

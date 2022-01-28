@@ -4,7 +4,10 @@ from src.containers.container_configs import ContainerConfigs
 from src.containers.container_repos import ContainerRepos
 from src.containers.container_services import ContainerServices
 from src.containers.container_utilities import ContainerUtilities
-from src.routers.v1 import users
+from src.routers.v1 import (
+    users,
+    auth
+)
 
 
 def create_app() -> FastAPI:
@@ -28,6 +31,7 @@ def create_app() -> FastAPI:
 
     # add router to application
     application.include_router(users.router)
+    application.include_router(auth.router)
 
     return application
 

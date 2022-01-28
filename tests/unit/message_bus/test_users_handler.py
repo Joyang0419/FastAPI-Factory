@@ -33,13 +33,13 @@ class TestUsersHandler:
 
     @pytest.fixture(autouse=True)
     def setup(self, test_case):
-        self.users_handler = UsersHandler()
+        self.handler = UsersHandler()
         self.test_case = test_case
 
     def test_handlers(self):
         assert all(
             [
-                each_key in self.users_handler.handlers
+                each_key in self.handler.handlers
                 for each_key in self.test_case
             ]
         )
@@ -90,5 +90,5 @@ class TestUsersHandler:
     )
     @pytest.mark.asyncio
     async def test_handle(self, test_event):
-        result = await self.users_handler.handle(event=test_event)
+        result = await self.handler.handle(event=test_event)
         assert isinstance(result, list)
