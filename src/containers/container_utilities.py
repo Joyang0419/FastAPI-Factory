@@ -5,6 +5,7 @@ from src.containers.container_configs import ContainerConfigs
 from src.utilities.db_manager.imp_sqlalchemy import IMPSqlalchemy
 from src.utilities.encrypt_pwd.imp_crypt_context import IMPCryptManager
 from src.utilities.notification.imp_gmail import IMPGmail
+from src.utilities.jwt_token.imp_jwt import IMPJWTManager
 
 container_configs = ContainerConfigs()
 
@@ -36,4 +37,8 @@ class ContainerUtilities(containers.DeclarativeContainer):
     crypt_manager = providers.Factory(
         IMPCryptManager,
         crypt_context=crypt_context
+    )
+
+    jwt_manager = providers.Factory(
+        IMPJWTManager
     )

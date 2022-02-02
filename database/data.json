@@ -1,18 +1,35 @@
 [
     {
+        "target_class": "src.models.roles:Role",
+        "data": [
+            {
+                "id": "1",
+                "name": "User",
+                "permissions": 1
+            },
+            {
+                "id": "2",
+                "name": "Admin",
+                "permissions": 15
+            }
+        ]
+    },
+    {
         "target_class": "src.models.users:User",
         "data": [
             {
                 "id": "1",
                 "email": "Joyang0419@gmail.com",
-                "hashed_password": "test",
-                "is_active": true
+                "password": "test",
+                "is_active": true,
+                "role_id": 1
             },
             {
                 "id": "2",
                 "email": "Test@gmail.com",
-                "hashed_password": "test",
-                "is_active": true
+                "password": "test",
+                "is_active": true,
+                "role_id": 2
             }
         ]
     }

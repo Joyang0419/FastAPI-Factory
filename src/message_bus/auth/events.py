@@ -13,3 +13,11 @@ class Event(BaseModel):
 class AuthenticateUser(Event):
     output_key: UserInfosOutputKey
     authenticate_data: UserAuthenticate
+
+
+class CreateAccessToken(Event):
+    authenticate_data: UserAuthenticate
+
+
+class GetTokenDecodeData(Event):
+    token: str

@@ -1,12 +1,19 @@
-from typing import Union
+from typing import Union, Optional
+from functools import wraps
 
 from src.containers.container_utilities import ContainerUtilities
 from src.message_bus.auth import events
 from src.repos.orm.repo_users import IMPRepoUsers
+from src.schemas.jwt_token import Token
 from src.services.interface.service_auth import IFServiceAuth
 from src.services.orm.service_users import IMPServiceUsers
+from src.schemas.jwt_token import JWTTokenPayload
+from src.models.users import User
+from fastapi import Response, status
 
-crypt_manager = ContainerUtilities().crypt_manager()
+container_utilities = ContainerUtilities()
+crypt_manager = container_utilities.crypt_manager()
+jwt_manager = container_utilities.jwt_manager()
 
 
 class IMPServiceAuth(IFServiceAuth):
@@ -26,6 +33,22 @@ class IMPServiceAuth(IFServiceAuth):
         Returns:
             User object or False
         """
+        user = await self._get_current_user(event=event)
+
+        if not user:
+            return False
+
+        output = IMPServiceUsers.packing_be_output_dict(
+            input_data=[user],
+            output_key=event.output_key
+        )
+
+        return output
+
+    async def _get_current_user(
+            self,
+            event: Union[events.AuthenticateUser, events.CreateAccessToken]
+    ) -> Union[User, bool]:
         user = await self.repo_users.get_user_by_email(
             email=event.authenticate_data.email
         )
@@ -39,26 +62,56 @@ class IMPServiceAuth(IFServiceAuth):
         ):
             return False
 
-        output = IMPServiceUsers.packing_be_output_dict(
-            input_data=[user],
-            output_key=event.output_key
-        )
+        return user
 
-        return output
+    async def create_access_token(
+            self,
+            event: events.CreateAccessToken
+    ) -> Optional[Token]:
+
+        user = await self._get_current_user(event=event)
+
+        if not user:
+            return None
+
+        jwt_token_payload = JWTTokenPayload(sub=user.email)
+        token = jwt_manager.create_access_token(data=jwt_token_payload)
+        return Token(access_token=token)
 
     def collect_new_events(self):
         while self.events:
             yield self.events.pop(0)
 
+    @staticmethod
+    def get_token_decode_data(event: events.GetTokenDecodeData) \
+            -> Optional[dict]:
 
+        jwt_payload = jwt_manager.get_token_payload(token=event.token)
 
-# def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-#     to_encode = data.copy()
-#     if expires_delta:
-#         expire = datetime.utcnow() + expires_delta
-#     else:
-#         expire = datetime.utcnow() + timedelta(minutes=15)
-#     to_encode.update({"exp": expire})
-#     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-#     return encoded_jwt
+        if not jwt_payload:
+            return None
 
+        return jwt_payload
+
+    def permissions_required_decorator(self, permissions):
+        def decorator(function):
+            @wraps(function)
+            async def wrappers(*args, **kwargs):
+                token_payload = await jwt_manager.get_token_payload(
+                    token=kwargs['token']
+                )
+                user_email = token_payload['sub']
+                current_user = await self.repo_users.get_user_by_email(
+                    email=user_email
+                )
+
+                if current_user.roles.permissions < permissions:
+                    return Response(
+                        status_code=status.HTTP_403_FORBIDDEN
+                    )
+
+                return await function(*args, **kwargs)
+
+            return wrappers
+
+        return decorator

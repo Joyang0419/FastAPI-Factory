@@ -5,7 +5,7 @@ from src.message_bus.auth import events
 
 container_service = ContainerServices()
 
-from src.message_bus.interface_handler import IFHandler, Event
+from src.message_bus.interface_handler import IFHandler
 
 
 class AuthHandler(IFHandler):
@@ -18,6 +18,8 @@ class AuthHandler(IFHandler):
     def handlers(self) -> Dict[Type[events.Event], List[Callable]]:
         return {
             events.AuthenticateUser: [self.service_auth.authenticate_user],
+            events.CreateAccessToken: [self.service_auth.create_access_token],
+            events.GetTokenDecodeData: [self.service_auth.get_token_decode_data]
         }
 
 

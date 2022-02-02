@@ -14,6 +14,8 @@ service_auth = ContainerServices().service_auth()
     pytest.param(
         [
             events.AuthenticateUser,
+            events.GetTokenDecodeData,
+            events.CreateAccessToken
         ],
         id='test_key'
     ),
@@ -48,7 +50,27 @@ class TestAuthHandler:
                     )
                 ),
                 id='events.AuthenticateUse'
-            )
+            ),
+            pytest.param(
+                events.CreateAccessToken(
+                    authenticate_data=UserAuthenticate(
+                        email='sss',
+                        password='sss'
+                    )
+                ),
+                id='events.CreateAccessToken'
+            ),
+            pytest.param(
+                events.GetTokenDecodeData(
+                    token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJGYXN'
+                          '0QVBJIEZhY3RvcnkiLCJzdWIiOiJKb3lhbmcwNDE5QGdtYWlsLmN'
+                          'vbSIsImV4cCI6MjI0MzY3MjA3MywibmJmIjoxNjQzNjcyMDczLCJ'
+                          'pYXQiOjE2NDM2NzIwNzN9.mBCk6FX-MZBWljFuOcMYSUTNQYOzta'
+                          '0YRmms5ehd8fo'
+                ),
+                id='events.GetTokenDecodeData'
+            ),
+
         ]
     )
     @pytest.mark.asyncio

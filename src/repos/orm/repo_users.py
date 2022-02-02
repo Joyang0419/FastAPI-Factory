@@ -100,7 +100,6 @@ class IMPRepoUsers(IFRepoUser):
         Returns:
             [sqlalchemy object]
         """
-
         model_objects = [User(**each.dict()) for each in data]
 
         async with self.db() as db:
@@ -167,25 +166,3 @@ class IMPRepoUsers(IFRepoUser):
         update_rows = await self.get_users_by_ids(user_ids)
 
         return update_rows
-
-if __name__ == '__main__':
-    from src.containers.container_utilities import ContainerUtilities
-    import asyncio
-
-    import asyncio
-
-
-    async def qqq():
-        a = ContainerUtilities().db_manager()
-        b = IMPRepoUsers(
-            db=a.get_async_db
-        )
-        c = await b.get_user_by_email(email='string')
-        print(type(c))
-
-    # correct todo delete
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(qqq())
-
-
-

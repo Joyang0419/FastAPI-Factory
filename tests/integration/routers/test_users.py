@@ -149,7 +149,7 @@ class TestUsers:
                     'data': [
                         UserCreate(
                             email='test_email1',
-                            hashed_password='test_pwd'
+                            password='test_pwd'
                         ).dict()
                     ]
                 },

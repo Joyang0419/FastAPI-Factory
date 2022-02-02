@@ -15,11 +15,10 @@ class TestServiceUsers:
     async def test_get_all_users(self):
         """
         GIVEN an service_users()
+
         WHEN service_users().get_all_users()
+
         THEN assert isinstance(output, dict)
-
-        Returns:
-
         """
         event = events.GetAllUsers(output_key=UserInfosOutputKey.id)
         output = await self.service_users.get_all_users(
