@@ -1,3 +1,4 @@
+from loguru import logger
 from typing import List
 
 from dependency_injector.wiring import inject

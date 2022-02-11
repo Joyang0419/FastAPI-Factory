@@ -8,16 +8,16 @@ from src.routers.v1 import (
     users,
     auth
 )
+from src.logger import init_logging
 
 
 def create_app() -> FastAPI:
-
+    init_logging()
     # containers
     container_services = ContainerServices()
     container_tools = ContainerUtilities()
     container_repos = ContainerRepos()
     container_configs = ContainerConfigs()
-
     # create FastAPI
     application = FastAPI(
         title=container_configs.config.app_config.title(),
