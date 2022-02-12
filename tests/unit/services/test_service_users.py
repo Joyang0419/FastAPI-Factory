@@ -92,13 +92,13 @@ class TestServiceUsers:
 
         """
 
-        event = events.CreateUsers(
+        command = events.CreateUsers(
             create_data=test_case['insert_data'],
             output_key=UserInfosOutputKey.email
         )
 
         output = await self.service_users.create_users(
-            event=event
+            command=command
         )
 
         assert isinstance(output, dict)
@@ -166,7 +166,7 @@ class TestServiceUsers:
             user_ids=test_case['user_ids']
         )
         output = await self.service_users.delete_users_by_ids(
-            event=event
+            command=event
         )
 
         assert isinstance(output, dict)

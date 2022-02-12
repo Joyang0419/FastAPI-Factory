@@ -2,7 +2,7 @@ from typing import Union, Optional
 from functools import wraps
 
 from src.containers.container_utilities import ContainerUtilities
-from src.message_bus.auth import events
+from src.domains.auth import commands, events
 from src.repos.orm.repo_users import IMPRepoUsers
 from src.schemas.jwt_token import Token
 from src.services.interface.service_auth import IFServiceAuth
@@ -28,12 +28,12 @@ class IMPServiceAuth(IFServiceAuth):
         get event include account, password, to certificate user table
 
         Args:
-            event: message_bus's events.UserAuthenticate
+            event: handlers's events.UserAuthenticate
 
         Returns:
             User object or False
         """
-        user = await self._get_current_user(event=event)
+        user = await self._get_current_user(event_or_command=event)
 
         if not user:
             return False
@@ -47,17 +47,18 @@ class IMPServiceAuth(IFServiceAuth):
 
     async def _get_current_user(
             self,
-            event: Union[events.AuthenticateUser, events.CreateAccessToken]
+            event_or_command:
+            Union[events.AuthenticateUser, commands.CreateAccessToken]
     ) -> Union[User, bool]:
         user = await self.repo_users.get_user_by_email(
-            email=event.authenticate_data.email
+            email=event_or_command.authenticate_data.email
         )
 
         if not user:
             return False
 
         if not crypt_manager.verify_pwd(
-            plain_pwd=event.authenticate_data.password,
+            plain_pwd=event_or_command.authenticate_data.password,
             hashed_pwd=user.password
         ):
             return False
@@ -66,10 +67,10 @@ class IMPServiceAuth(IFServiceAuth):
 
     async def create_access_token(
             self,
-            event: events.CreateAccessToken
+            command: commands.CreateAccessToken
     ) -> Optional[Token]:
 
-        user = await self._get_current_user(event=event)
+        user = await self._get_current_user(event_or_command=command)
 
         if not user:
             return None

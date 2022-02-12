@@ -1,7 +1,7 @@
 import abc
 from typing import Union
 
-from src.message_bus.auth import events
+from src.domains.auth import commands, events
 from src.schemas.jwt_token import Token
 from src.schemas.models.users import User
 
@@ -14,7 +14,7 @@ class IFServiceAuth(abc.ABC):
         return NotImplemented
 
     @abc.abstractmethod
-    def create_access_token(self, event: events.CreateAccessToken) -> Token:
+    def create_access_token(self, command: commands.CreateAccessToken) -> Token:
         return NotImplemented
 
     @staticmethod

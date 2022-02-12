@@ -1,7 +1,9 @@
+from pydantic import BaseModel
 
-class Command:
+
+class Command(BaseModel):
     pass
 
 
-class Event:
+class Event(BaseModel):
     pass

@@ -5,8 +5,9 @@ from fastapi import (
     HTTPException
 )
 
-from src.message_bus.auth import events
-from src.message_bus.auth.handler import AuthHandler
+# from src.handlers.auth import events
+# from src.handlers.auth.handler import AuthHandler
+from src.domains.auth import commands, events, handlers
 from src.schemas.models.users import UserAuthenticate
 from src.schemas.routers.users import (
     UserInfos,
@@ -31,7 +32,7 @@ router = APIRouter(
 async def authenticate_user(
         output_key: UserInfosOutputKey,
         data: UserAuthenticate,
-        handler=Depends(AuthHandler)
+        handler=Depends(handlers.AuthHandler)
 ):
     event = events.AuthenticateUser(
         output_key=output_key,
@@ -52,15 +53,15 @@ async def authenticate_user(
 @router.post('/token', response_model=Token)
 async def create_access_token(
         form_data: OAuth2PasswordRequestForm = Depends(),
-        handler=Depends(AuthHandler)
+        handler=Depends(handlers.AuthHandler)
 ):
-    event = events.CreateAccessToken(
+    command = commands.CreateAccessToken(
         authenticate_data=UserAuthenticate(
             email=form_data.username,
             password=form_data.password
         )
     )
-    results = await handler.handle(event)
+    results = await handler.handle(command)
     data = results.pop(0)
 
     if not data:
@@ -77,7 +78,7 @@ async def create_access_token(
 @get_permissions_required_decorator(RolePermissions.Admin.permissions)
 async def get_token_decode_data(
         token: str = Depends(get_security()),
-        handler=Depends(AuthHandler),
+        handler=Depends(handlers.AuthHandler),
 ):
     event = events.GetTokenDecodeData(
         token=token
@@ -93,5 +94,3 @@ async def get_token_decode_data(
         )
 
     return data
-
-

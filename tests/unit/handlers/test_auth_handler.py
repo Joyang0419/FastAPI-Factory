@@ -1,11 +1,9 @@
 import pytest
 
 from src.containers.container_services import ContainerServices
-from src.message_bus.auth.handler import AuthHandler
-from src.message_bus.auth import events
-from src.schemas.routers.users import UserInfosOutputKey
+from src.domains.auth import events, commands, handlers
 from src.schemas.models.users import UserAuthenticate
-
+from src.schemas.routers.users import UserInfosOutputKey
 
 service_auth = ContainerServices().service_auth()
 
@@ -15,32 +13,52 @@ service_auth = ContainerServices().service_auth()
         [
             events.AuthenticateUser,
             events.GetTokenDecodeData,
-            events.CreateAccessToken
         ],
         id='test_key'
     ),
 ])
-def test_case(request):
+def test_events(request):
+    yield request.param
+
+
+@pytest.fixture(scope='function', params=[
+    pytest.param(
+        [
+            commands.CreateAccessToken
+        ],
+        id='test_key'
+    ),
+])
+def test_commands(request):
     yield request.param
 
 
 class TestAuthHandler:
 
     @pytest.fixture(autouse=True)
-    def setup(self, test_case):
-        self.handler = AuthHandler()
-        self.test_case = test_case
+    def setup(self, test_events, test_commands):
+        self.handler = handlers.AuthHandler()
+        self.test_events = test_events
+        self.test_commands = test_commands
 
-    def test_handlers(self):
+    def test_event_handlers(self):
         assert all(
             [
-                each_key in self.handler.handlers
-                for each_key in self.test_case
+                each_key in self.handler.EVENT_HANDLERS
+                for each_key in self.test_events
+            ]
+        )
+
+    def test_command_handlers(self):
+        assert all(
+            [
+                each_key in self.handler.COMMAND_HANDLERS
+                for each_key in self.test_commands
             ]
         )
 
     @pytest.mark.parametrize(
-        "test_event", [
+        "test_message", [
             pytest.param(
                 events.AuthenticateUser(
                     output_key=UserInfosOutputKey.id,
@@ -52,13 +70,13 @@ class TestAuthHandler:
                 id='events.AuthenticateUse'
             ),
             pytest.param(
-                events.CreateAccessToken(
+                commands.CreateAccessToken(
                     authenticate_data=UserAuthenticate(
                         email='sss',
                         password='sss'
                     )
                 ),
-                id='events.CreateAccessToken'
+                id='commands.CreateAccessToken'
             ),
             pytest.param(
                 events.GetTokenDecodeData(
@@ -74,6 +92,6 @@ class TestAuthHandler:
         ]
     )
     @pytest.mark.asyncio
-    async def test_handle(self, test_event):
-        result = await self.handler.handle(event=test_event)
+    async def test_handle(self, test_message):
+        result = await self.handler.handle(message=test_message)
         assert isinstance(result, list)

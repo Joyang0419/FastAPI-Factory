@@ -1,5 +1,4 @@
 from src.utilities.notification.interface import IFNotificationManager
-from src.message_bus.users import events
 
 
 class IMPGmail(IFNotificationManager):

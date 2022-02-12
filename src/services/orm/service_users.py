@@ -1,7 +1,7 @@
 import typing
 
 from src.containers.container_utilities import ContainerUtilities
-from src.message_bus.users import events
+from src.domains.users import events, commands
 from src.models.users import User as ModelUser
 from src.repos.orm.repo_users import IMPRepoUsers
 from src.schemas.models.users import (
@@ -57,24 +57,24 @@ class IMPServiceUsers(IFServiceUsers):
 
     async def update_users_by_ids(
             self,
-            event: events.UpdateUsersByIDS
+            command: commands.UpdateUsersByIDS
     ) -> dict:
         output = {}
 
-        if event.update_data.password:
-            event.update_data.password = self._hash_pwd(
-                event.update_data.password
+        if command.update_data.password:
+            command.update_data.password = self._hash_pwd(
+                command.update_data.password
             )
 
         repo_result = await self.repo_users.update_users_by_ids(
-            user_ids=event.user_ids,
-            data=event.update_data
+            user_ids=command.user_ids,
+            data=command.update_data
         )
 
         if repo_result:
 
             output = self.packing_be_output_dict(
-                output_key=event.output_key,
+                output_key=command.output_key,
                 input_data=repo_result
             )
 
@@ -88,18 +88,18 @@ class IMPServiceUsers(IFServiceUsers):
 
     async def create_users(
             self,
-            event: events.CreateUsers
+            command: commands.CreateUsers
     ) -> dict:
 
-        for each in event.create_data:
+        for each in command.create_data:
             each.password = self._hash_pwd(each.password)
 
         repo_result = await self.repo_users.create_users(
-            data=event.create_data
+            data=command.create_data
         )
 
         output = self.packing_be_output_dict(
-            output_key=event.output_key,
+            output_key=command.output_key,
             input_data=repo_result
         )
 
@@ -117,25 +117,25 @@ class IMPServiceUsers(IFServiceUsers):
 
     async def delete_users_by_ids(
             self,
-            event: events.DeleteUsersByIDs
+            command: commands.DeleteUsersByIDs
     ) -> dict:
         output = {}
 
         repo_result = await self.repo_users.delete_users_by_ids(
-            user_ids=event.user_ids,
+            user_ids=command.user_ids,
         )
 
         if repo_result:
             output = self.packing_be_output_dict(
-                output_key=event.output_key,
+                output_key=command.output_key,
                 input_data=repo_result
             )
 
             for each_user in output.values():
-                event = events.Notification(
+                command = events.Notification(
                     message=f"User id: {each_user.id}, deleted."
                 )
-                self.events.append(event)
+                self.events.append(command)
 
         return output
 
